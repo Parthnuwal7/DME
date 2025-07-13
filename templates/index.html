@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Upload CSV - Data Mapping System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Upload CSV File</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Select CSV Files</label>
+                        <input type="file" class="form-control" id="file" name="files" accept=".csv" multiple required>
+                        <div class="form-text">Maximum file size: 16MB per file. You can select multiple CSV files.</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="process_headers" name="process_headers" checked>
+                            <label class="form-check-label" for="process_headers">
+                                File has headers
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload and Process</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>How it works</h4>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Upload your CSV file using the form above</li>
+                    <li>The system will automatically detect relationships between columns</li>
+                    <li>View and edit the generated relationship graph</li>
+                    <li>Save your final data model for mapping</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

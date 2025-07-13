@@ -1,0 +1,560 @@
+{
+  "relationships": {
+    "nodes": [
+      {
+        "id": 0,
+        "label": "File: 2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv",
+        "type": "file",
+        "properties": {
+          "filename": "2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv",
+          "rows": 50,
+          "columns": 5
+        }
+      },
+      {
+        "id": 1,
+        "label": "2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv: order_item_id",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            "itm-c62c8d52",
+            "itm-e5994f5d",
+            "itm-38321d17"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 2,
+        "label": "2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv: order_id",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 28,
+          "sample_values": [
+            "ord-fb3104c2",
+            "ord-2f88dc06",
+            "ord-9ab8dac0"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 3,
+        "label": "2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv: product_id",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 29,
+          "sample_values": [
+            "prd-0da50a3d",
+            "prd-9c6a5067",
+            "prd-7b72ecae"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 4,
+        "label": "2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv: quantity",
+        "type": "column",
+        "properties": {
+          "data_type": "int64",
+          "null_count": 0,
+          "unique_count": 5,
+          "sample_values": [
+            4,
+            4,
+            3
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 5,
+        "label": "2ff02799-608b-44e7-b4c5-6db73acf6988_order_items.csv: unit_price",
+        "type": "column",
+        "properties": {
+          "data_type": "float64",
+          "null_count": 0,
+          "unique_count": 29,
+          "sample_values": [
+            7415.79,
+            9469.31,
+            4455.86
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 6,
+        "label": "File: 8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv",
+        "type": "file",
+        "properties": {
+          "filename": "8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv",
+          "rows": 50,
+          "columns": 5
+        }
+      },
+      {
+        "id": 7,
+        "label": "8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv: order_id",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            "ord-842e1e0d",
+            "ord-363900b1",
+            "ord-a76a0cb6"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 8,
+        "label": "8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv: customer_id",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 31,
+          "sample_values": [
+            "cst-f7c46123",
+            "cst-cae91ab6",
+            "cst-6bafd1fd"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 9,
+        "label": "8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv: order_date",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            "2024-09-03 02:07:53",
+            "2025-02-28 11:34:24",
+            "2025-06-04 16:21:55"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 10,
+        "label": "8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv: total_amount",
+        "type": "column",
+        "properties": {
+          "data_type": "float64",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            11970.58,
+            19088.69,
+            3455.79
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 11,
+        "label": "8f64b7be-a558-49c8-92ce-d8266fb05903_orders.csv: status",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 4,
+          "sample_values": [
+            "Cancelled",
+            "Delivered",
+            "Cancelled"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 12,
+        "label": "File: e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv",
+        "type": "file",
+        "properties": {
+          "filename": "e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv",
+          "rows": 50,
+          "columns": 5
+        }
+      },
+      {
+        "id": 13,
+        "label": "e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv: product_id",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            "prd-015106c3",
+            "prd-19413b43",
+            "prd-4752cfbd"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 14,
+        "label": "e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv: name",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            "Profound global intranet",
+            "Horizontal 6thgeneration hub",
+            "Digitized executive info-mediaries"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 15,
+        "label": "e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv: category",
+        "type": "column",
+        "properties": {
+          "data_type": "object",
+          "null_count": 0,
+          "unique_count": 5,
+          "sample_values": [
+            "Electronics",
+            "Clothing",
+            "Books"
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 16,
+        "label": "e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv: price",
+        "type": "column",
+        "properties": {
+          "data_type": "float64",
+          "null_count": 0,
+          "unique_count": 50,
+          "sample_values": [
+            6536.88,
+            3806.52,
+            3308.05
+          ],
+          "total_rows": 50
+        }
+      },
+      {
+        "id": 17,
+        "label": "e128f5fb-e9d1-46f4-bf26-56ff7eadc39b_products.csv: stock_quantity",
+        "type": "column",
+        "properties": {
+          "data_type": "int64",
+          "null_count": 0,
+          "unique_count": 48,
+          "sample_values": [
+            419,
+            259,
+            87
+          ],
+          "total_rows": 50
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": 0,
+        "to": 1,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 0,
+        "to": 2,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 0,
+        "to": 3,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 0,
+        "to": 4,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 0,
+        "to": 5,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 6,
+        "to": 7,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 6,
+        "to": 8,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 6,
+        "to": 9,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 6,
+        "to": 10,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 6,
+        "to": 11,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 12,
+        "to": 13,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 12,
+        "to": 14,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 12,
+        "to": 15,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 12,
+        "to": 16,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 12,
+        "to": 17,
+        "label": "contains",
+        "weight": 1.0,
+        "type": "file_structure"
+      },
+      {
+        "from": 1,
+        "to": 7,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 1,
+        "to": 8,
+        "label": "cross_file_similarity_0.39",
+        "weight": 0.386,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 1,
+        "to": 9,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 2,
+        "to": 7,
+        "label": "cross_file_similarity_1.00",
+        "weight": 1.0,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 2,
+        "to": 8,
+        "label": "cross_file_similarity_0.47",
+        "weight": 0.47096774193548385,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 2,
+        "to": 9,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.368,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 3,
+        "to": 7,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.374,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 3,
+        "to": 8,
+        "label": "cross_file_similarity_0.48",
+        "weight": 0.4806451612903226,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 3,
+        "to": 9,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.374,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 5,
+        "to": 10,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.374,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 1,
+        "to": 13,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 1,
+        "to": 14,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 2,
+        "to": 13,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.368,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 2,
+        "to": 14,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.368,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 3,
+        "to": 13,
+        "label": "cross_file_similarity_1.00",
+        "weight": 1.0,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 3,
+        "to": 14,
+        "label": "cross_file_similarity_0.37",
+        "weight": 0.374,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 5,
+        "to": 16,
+        "label": "cross_file_similarity_0.55",
+        "weight": 0.548,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 7,
+        "to": 13,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 7,
+        "to": 14,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 8,
+        "to": 13,
+        "label": "cross_file_similarity_0.39",
+        "weight": 0.386,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 8,
+        "to": 14,
+        "label": "cross_file_similarity_0.39",
+        "weight": 0.386,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 9,
+        "to": 13,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 9,
+        "to": 14,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 10,
+        "to": 16,
+        "label": "cross_file_similarity_0.50",
+        "weight": 0.5,
+        "type": "cross_file_relationship"
+      },
+      {
+        "from": 11,
+        "to": 15,
+        "label": "cross_file_similarity_0.44",
+        "weight": 0.44,
+        "type": "cross_file_relationship"
+      }
+    ]
+  },
+  "created_at": "2025-07-13T11:47:11.943822",
+  "version": "initial"
+}

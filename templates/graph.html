@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Graph Editor - Data Mapping System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Relationship Graph</h3>
+                <div>
+                    <button class="btn btn-success" onclick="saveGraph()">Save Changes</button>
+                    <button class="btn btn-secondary" onclick="resetGraph()">Reset</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary">New Upload</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="graph-container">
+                    {{ graph_html|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4>File Information</h4>
+        </div>
+        <div class="card-body">
+            <div id="file-info">
+                <p>Files processed: <span id="file-count">{{ csv_info.files_count }}</span></p>
+                <p>Total rows: <span id="total-rows">{{ csv_info.total_rows }}</span></p>
+                <p>Total columns: <span id="total-columns">{{ csv_info.total_columns }}</span></p>
+                
+                <hr>
+                <h6>File Details:</h6>
+                {% for filename, details in csv_info.file_details.items() %}
+                    <div class="mb-2">
+                        <strong>{{ filename }}:</strong><br>
+                        <small>Rows: {{ details.rows }}, Columns: {{ details.columns }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h4>Graph Controls</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Graph Layout</label>
+                    <select class="form-select" id="layout-select">
+                        <option value="hierarchical">Hierarchical</option>
+                        <option value="physics" selected>Physics</option>
+                        <option value="circular">Circular</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Node Size</label>
+                    <input type="range" class="form-range" id="node-size" min="10" max="50" value="25">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Edge Width</label>
+                    <input type="range" class="form-range" id="edge-width" min="1" max="10" value="5">
+                </div>
+                
+                <hr>
+                
+                <div id="node-info">
+                    <h5>Node Information</h5>
+                    <p class="text-muted">Click on a node to see details</p>
+                </div>
+                
+                <div id="edge-info">
+                    <h5>Edge Information</h5>
+                    <p class="text-muted">Click on an edge to see details</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4>Statistics</h4>
+            </div>
+            <div class="card-body">
+                <div id="graph-stats">
+                    <p>Nodes: <span id="node-count">0</span></p>
+                    <p>Edges: <span id="edge-count">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store relationships data
+let currentRelationships = {{ relationships|safe }};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+{% endblock %}
