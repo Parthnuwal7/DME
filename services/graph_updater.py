@@ -48,27 +48,15 @@ class GraphUpdater:
         return self.load_initial_relationships()
     
     def get_version_history(self):
-        """Get history of changes"""
         history = []
-        
-        if os.path.exists(self.initial_file):
-            with open(self.initial_file, 'r') as f:
-                data = json.load(f)
-                history.append({
-                    'version': 'initial',
-                    'created_at': data.get('created_at'),
-                    'node_count': len(data.get('relationships', {}).get('nodes', [])),
-                    'edge_count': len(data.get('relationships', {}).get('edges', []))
-                })
-        
-        if os.path.exists(self.edited_file):
-            with open(self.edited_file, 'r') as f:
-                data = json.load(f)
-                history.append({
-                    'version': 'edited',
-                    'updated_at': data.get('updated_at'),
-                    'node_count': len(data.get('relationships', {}).get('nodes', [])),
-                    'edge_count': len(data.get('relationships', {}).get('edges', []))
-                })
-        
+        for fpath, label in [(self.initial_file, 'initial'), (self.edited_file, 'edited')]:
+            if os.path.exists(fpath):
+                with open(fpath, 'r') as f:
+                    data = json.load(f)
+                    rels = data.get('relationships', [])
+                    history.append({
+                        'version': label,
+                        'created_at' if label == 'initial' else 'updated_at': data.get('created_at' if label == 'initial' else 'updated_at'),
+                        'relationship_count': len(rels)
+                    })
         return history

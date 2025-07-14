@@ -63,14 +63,20 @@ body {
 }
 
 #graph-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #4e4ea9;
 }
 
 #graph-container::-webkit-scrollbar-thumb {
-    background: #888;
+    background: #b40404;
     border-radius: 4px;
 }
 
 #graph-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #609960;
+}
+
+#mynetwork {
+    height: 600px;
+    min-height: 600px;
+    width: 100%;
 }

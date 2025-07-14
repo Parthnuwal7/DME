@@ -5,16 +5,11 @@ let nodes, edges;
 let originalRelationships;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Store original relationships for reset functionality
+    const graphData = buildGraphFromFlatRelationships(currentRelationships);
+    currentRelationships = graphData;
     originalRelationships = JSON.parse(JSON.stringify(currentRelationships));
-    
-    // Initialize graph statistics
     updateGraphStats();
-    
-    // Set up event listeners
     setupEventListeners();
-    
-    // Initialize the vis.js network if PyVis didn't handle it
     initializeNetwork();
 });
 
@@ -181,5 +176,34 @@ function saveGraph() {
     });
 }
 
-// Add this to store filenames
-let currentFilenames = {{ filenames|tojson|safe }};
+function buildGraphFromFlatRelationships(flatRelationships) {
+    const nodeMap = {};
+    const nodes = [];
+    const edges = [];
+
+    flatRelationships.forEach((rel, index) => {
+        const fromLabel = `${rel.from_table}:${rel.from_column}`;
+        const toLabel = `${rel.to_table}:${rel.to_column}`;
+
+        if (!nodeMap[fromLabel]) {
+            nodeMap[fromLabel] = nodes.length;
+            nodes.push({ id: nodeMap[fromLabel], label: fromLabel });
+        }
+
+        if (!nodeMap[toLabel]) {
+            nodeMap[toLabel] = nodes.length;
+            nodes.push({ id: nodeMap[toLabel], label: toLabel });
+        }
+
+        edges.push({
+            from: nodeMap[fromLabel],
+            to: nodeMap[toLabel],
+            label: `Conf: ${rel.confidence}`,
+            title: `FK: ${fromLabel} → ${toLabel}`,
+            width: rel.confidence * 5
+        });
+    });
+
+    return { nodes, edges };
+}
+

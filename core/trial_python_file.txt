@@ -1,0 +1,365 @@
+import math
+import re
+from collections import Counter
+import pandas as pd
+import os
+from pprint import pprint
+
+def infer_data_type(series):
+    if pd.api.types.is_integer_dtype(series):
+        return "int"
+    elif pd.api.types.is_float_dtype(series):
+        return "float"
+    elif pd.api.types.is_bool_dtype(series):
+        return "bool"
+    elif pd.api.types.is_datetime64_any_dtype(series):
+        return "datetime"
+    else:
+        return "string"
+
+def compute_entropy(values) -> float:
+    """
+    Calculate Shannon entropy of a list of values.
+    """
+    if len(values) == 0:
+        return 0.0
+    counter = Counter(values)
+    total = len(values)
+    entropy = -sum((count/total) * math.log2(count/total) for count in counter.values())
+    return round(entropy, 4)
+
+def infer_regex_pattern(values, sample_size=100):
+    """
+    Infer the most common regex-like structure from string values.
+    Returns a simplified pattern string (not actual regex).
+    """
+    def simplify(val):
+        return re.sub(r'[A-Z]', 'A',
+               re.sub(r'[a-z]', 'a',
+               re.sub(r'\d', '9', val)))
+
+    simplified = [simplify(v) for v in values[:sample_size] if isinstance(v, str)]
+    if not simplified:
+        return None
+    pattern_counts = Counter(simplified)
+    most_common_pattern, _ = pattern_counts.most_common(1)[0]
+    return most_common_pattern
+
+def profile_column(series: pd.Series, total_rows: int) -> dict:
+    non_null_series = series.dropna()
+    n_unique = non_null_series.nunique()
+    data_type = infer_data_type(series)
+
+    profile = {
+        "data_type": str(data_type),
+        "is_unique": bool(n_unique == total_rows),
+        "is_complete": bool(series.isnull().sum() == 0),
+        "is_categorical": bool((n_unique < 0.1 * total_rows) and (data_type in ["string", "int"])),
+        "num_unique_values": float(n_unique),
+        "sample_values": [str(v) for v in non_null_series.unique()[:5]]
+    }
+    if data_type in ["string", "int"]:
+        profile["entropy"] = compute_entropy(non_null_series.astype(str).tolist())
+    if data_type == "string":
+        profile["regex_pattern"] = infer_regex_pattern(non_null_series.tolist())
+
+    return profile
+
+def profile_table(file_path: str) -> dict:
+    df = pd.read_csv(file_path)
+    total_rows = len(df)
+    table_profile = {
+        "table_name": os.path.basename(file_path),
+        "num_rows": total_rows,
+        "columns": {}
+    }
+
+    for col in df.columns:
+        table_profile["columns"][col] = profile_column(df[col], total_rows)
+
+    return table_profile
+
+def profile_multiple_tables(file_paths: list) -> dict:
+    result = {}
+    for file in file_paths:
+        result[os.path.basename(file)] = profile_table(file)
+    return result
+
+files = ['/content/customers.csv','/content/order_items.csv','/content/orders.csv','/content/products.csv']
+profile_data = profile_multiple_tables(files)
+profile_data
+
+profile_data output:
+
+{'customers.csv': {'table_name': 'customers.csv',
+  'num_rows': 10,
+  'columns': {'customer_id': {'data_type': 'int',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 10.0,
+    'sample_values': ['1', '2', '3', '4', '5'],
+    'entropy': 3.3219},
+   'name': {'data_type': 'string',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 10.0,
+    'sample_values': ['Customer 1',
+     'Customer 2',
+     'Customer 3',
+     'Customer 4',
+     'Customer 5'],
+    'entropy': 3.3219,
+    'regex_pattern': 'Aaaaaaaa 9'},
+   'email': {'data_type': 'string',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 10.0,
+    'sample_values': ['customer1@example.com',
+     'customer2@example.com',
+     'customer3@example.com',
+     'customer4@example.com',
+     'customer5@example.com'],
+    'entropy': 3.3219,
+    'regex_pattern': 'aaaaaaaa9@aaaaaaa.aaa'},
+   'created_at': {'data_type': 'string',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 10.0,
+    'sample_values': ['2022-11-24',
+     '2022-02-27',
+     '2022-01-13',
+     '2022-05-21',
+     '2022-05-06'],
+    'entropy': 3.3219,
+    'regex_pattern': '9999-99-99'}}},
+ 'order_items.csv': {'table_name': 'order_items.csv',
+  'num_rows': 58,
+  'columns': {'order_item_id': {'data_type': 'int',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 58.0,
+    'sample_values': ['1', '2', '3', '4', '5'],
+    'entropy': 5.858},
+   'order_id': {'data_type': 'int',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 30.0,
+    'sample_values': ['1', '2', '3', '4', '5'],
+    'entropy': 4.7493},
+   'product_id': {'data_type': 'int',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 15.0,
+    'sample_values': ['2', '7', '14', '9', '15'],
+    'entropy': 3.7733},
+   'quantity': {'data_type': 'int',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': True,
+    'num_unique_values': 5.0,
+    'sample_values': ['5', '4', '1', '3', '2'],
+    'entropy': 2.3032},
+   'item_price': {'data_type': 'float',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 15.0,
+    'sample_values': ['108.67', '38.05', '119.77', '185.08', '170.09']}}},
+ 'orders.csv': {'table_name': 'orders.csv',
+  'num_rows': 30,
+  'columns': {'order_id': {'data_type': 'int',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 30.0,
+    'sample_values': ['1', '2', '3', '4', '5'],
+    'entropy': 4.9069},
+   'customer_id': {'data_type': 'int',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 10.0,
+    'sample_values': ['5', '8', '6', '3', '4'],
+    'entropy': 3.1777},
+   'order_date': {'data_type': 'string',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 27.0,
+    'sample_values': ['2024-02-24',
+     '2024-06-16',
+     '2024-05-07',
+     '2024-04-11',
+     '2024-06-13'],
+    'entropy': 4.7069,
+    'regex_pattern': '9999-99-99'},
+   'total_amount': {'data_type': 'float',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 28.0,
+    'sample_values': ['1294.4', '304.85', '1357.71', '207.29', '1719.52']}}},
+ 'products.csv': {'table_name': 'products.csv',
+  'num_rows': 15,
+  'columns': {'product_id': {'data_type': 'int',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 15.0,
+    'sample_values': ['1', '2', '3', '4', '5'],
+    'entropy': 3.9069},
+   'name': {'data_type': 'string',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 15.0,
+    'sample_values': ['Product 1',
+     'Product 2',
+     'Product 3',
+     'Product 4',
+     'Product 5'],
+    'entropy': 3.9069,
+    'regex_pattern': 'Aaaaaaa 9'},
+   'category': {'data_type': 'string',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 4.0,
+    'sample_values': ['Electronics', 'Home', 'Clothing', 'Books'],
+    'entropy': 1.7819,
+    'regex_pattern': 'Aaaaaaaaaaa'},
+   'price': {'data_type': 'float',
+    'is_unique': True,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 15.0,
+    'sample_values': ['212.46', '108.67', '55.09', '287.59', '107.61']},
+   'stock_quantity': {'data_type': 'int',
+    'is_unique': False,
+    'is_complete': True,
+    'is_categorical': False,
+    'num_unique_values': 14.0,
+    'sample_values': ['90', '89', '56', '83', '34'],
+    'entropy': 3.7736}}}}
+
+
+def detect_primary_keys(profile_data):
+    table_keys = {}
+    for table, meta in profile_data.items():
+        primary_keys = []
+        candidate_keys = []
+
+        for col, props in meta["columns"].items():
+            if props["is_unique"] and props["is_complete"]:
+                primary_keys.append(col)
+            elif props["is_unique"]:
+                candidate_keys.append(col)
+
+        table_keys[table] = {
+            "primary_keys": primary_keys,
+            "candidate_keys": candidate_keys
+        }
+    return table_keys
+
+def detect_foreign_keys(file_paths, profile_data, table_keys):
+    dataframes = {os.path.basename(file): pd.read_csv(file) for file in file_paths} # Modified to key by filename
+    relationships = []
+
+    for from_table_path, df_from in dataframes.items(): # Iterate through filenames
+        from_table = os.path.basename(from_table_path) # Get filename
+        for from_col in df_from.columns:
+            from_profile = profile_data[from_table]["columns"][from_col] # Use filename as key
+
+            # Only consider non-unique columns as FK candidates
+            if from_profile["is_unique"]:
+                continue
+
+            from_values = set(df_from[from_col].dropna())
+
+            for to_table_path, df_to in dataframes.items(): # Iterate through filenames
+                to_table = os.path.basename(to_table_path) # Get filename
+                if from_table == to_table:
+                    continue
+
+                for pk_col in table_keys[to_table]["primary_keys"]: # Use filename as key
+                    to_values = set(df_to[pk_col].dropna())
+                    if not from_values or not to_values:
+                        continue
+
+                    # Foreign Key Match: if > 80% FK values found in PK values
+                    common = from_values & to_values
+                    overlap_ratio = len(common) / len(from_values)
+
+                    if overlap_ratio > 0.8:
+                        relationships.append({
+                            "from_table": from_table,
+                            "from_column": from_col,
+                            "to_table": to_table,
+                            "to_column": pk_col,
+                            "confidence": round(overlap_ratio, 4)
+                        })
+    return relationships
+
+
+table_keys = detect_primary_keys(profile_data)
+relationships = detect_foreign_keys(files, profile_data, table_keys)
+relationships
+
+Output: 
+[{'from_table': 'order_items.csv',
+  'from_column': 'order_id',
+  'to_table': 'orders.csv',
+  'to_column': 'order_id',
+  'confidence': 1.0},
+ {'from_table': 'order_items.csv',
+  'from_column': 'product_id',
+  'to_table': 'orders.csv',
+  'to_column': 'order_id',
+  'confidence': 1.0},
+ {'from_table': 'order_items.csv',
+  'from_column': 'product_id',
+  'to_table': 'products.csv',
+  'to_column': 'product_id',
+  'confidence': 1.0},
+ {'from_table': 'order_items.csv',
+  'from_column': 'quantity',
+  'to_table': 'customers.csv',
+  'to_column': 'customer_id',
+  'confidence': 1.0},
+ {'from_table': 'order_items.csv',
+  'from_column': 'quantity',
+  'to_table': 'orders.csv',
+  'to_column': 'order_id',
+  'confidence': 1.0},
+ {'from_table': 'order_items.csv',
+  'from_column': 'quantity',
+  'to_table': 'products.csv',
+  'to_column': 'product_id',
+  'confidence': 1.0},
+ {'from_table': 'order_items.csv',
+  'from_column': 'item_price',
+  'to_table': 'products.csv',
+  'to_column': 'price',
+  'confidence': 1.0},
+ {'from_table': 'orders.csv',
+  'from_column': 'customer_id',
+  'to_table': 'customers.csv',
+  'to_column': 'customer_id',
+  'confidence': 1.0},
+ {'from_table': 'orders.csv',
+  'from_column': 'customer_id',
+  'to_table': 'order_items.csv',
+  'to_column': 'order_item_id',
+  'confidence': 1.0},
+ {'from_table': 'orders.csv',
+  'from_column': 'customer_id',
+  'to_table': 'products.csv',
+  'to_column': 'product_id',
+  'confidence': 1.0}]
