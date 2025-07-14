@@ -1,273 +1,193 @@
+import math
+import re
+import os
 import pandas as pd
-import json
-import numpy as np
+from collections import Counter
 
 class CoreDataEngine:
-    """
-    Placeholder for your core data processing engine.
-    This will be where you implement your relationship detection logic.
-    """
-    
     def __init__(self):
-        self.processed_data = None
-    
-    def process_data(self, csv_data):
-        """
-        Process CSV data and return relationships in JSON format.
-        This is a placeholder - you'll implement your actual logic here.
-        
-        Args:
-            csv_data (pd.DataFrame): The uploaded CSV data
-            
-        Returns:
-            dict: Relationships in the format expected by the graph visualizer
-        """
-        # Placeholder implementation - generates sample relationships
-        return self._generate_sample_relationships(csv_data)
-    
-    def _convert_to_serializable(self, obj):
-        """Convert numpy/pandas types to JSON serializable types"""
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        elif pd.isna(obj):
-            return None
+        pass
+
+    def infer_data_type(self, series):
+        if pd.api.types.is_integer_dtype(series):
+            return "int"
+        elif pd.api.types.is_float_dtype(series):
+            return "float"
+        elif pd.api.types.is_bool_dtype(series):
+            return "bool"
+        elif pd.api.types.is_datetime64_any_dtype(series):
+            return "datetime"
         else:
-            return obj
-    
-    def _get_column_info(self, df, col):
-        """Get column information with proper type conversion"""
-        try:
-            null_count = int(df[col].isnull().sum())
-            unique_count = int(df[col].nunique())
-            data_type = str(df[col].dtype)
-            
-            # Get some sample values
-            sample_values = df[col].dropna().head(3).tolist()
-            sample_values = [self._convert_to_serializable(val) for val in sample_values]
-            
-            return {
-                "data_type": data_type,
-                "null_count": null_count,
-                "unique_count": unique_count,
-                "sample_values": sample_values,
-                "total_rows": len(df)
-            }
-        except Exception as e:
-            return {
-                "data_type": "unknown",
-                "null_count": 0,
-                "unique_count": 0,
-                "sample_values": [],
-                "total_rows": len(df),
-                "error": str(e)
-            }
-    
-    def _generate_sample_relationships(self, df):
-        """
-        Generate sample relationships for demonstration purposes.
-        Replace this with your actual relationship detection logic.
-        """
-        relationships = {
-            "nodes": [],
-            "edges": []
-        }
-        
-        # Create nodes from column names
-        for i, col in enumerate(df.columns):
-            node_data = {
-                "id": i,
-                "label": str(col),
-                "type": "column",
-                "properties": self._get_column_info(df, col)
-            }
-            relationships["nodes"].append(node_data)
-        
-        # Create sample edges based on column relationships
-        # This is a simple example - you'll replace with your logic
-        for i in range(len(df.columns)):
-            for j in range(i + 1, len(df.columns)):
-                # Simple heuristic: if columns have similar names or types, create edge
-                col1, col2 = df.columns[i], df.columns[j]
-                
-                # Calculate a simple similarity score
-                similarity = self._calculate_similarity(df, col1, col2)
-                
-                if similarity > 0.1:  # Threshold for creating edges
-                    relationships["edges"].append({
-                        "from": i,
-                        "to": j,
-                        "label": f"similarity_{similarity:.2f}",
-                        "weight": float(similarity),
-                        "type": "inferred"
-                    })
-        
-        return relationships
-    
-    def _calculate_similarity(self, df, col1, col2):
-        """
-        Calculate similarity between two columns.
-        This is a placeholder - implement your actual similarity logic.
-        """
-        try:
-            # Simple similarity based on data types
-            if df[col1].dtype == df[col2].dtype:
-                base_similarity = 0.5
-            else:
-                base_similarity = 0.1
-            
-            # Add name similarity
-            col1_lower = str(col1).lower()
-            col2_lower = str(col2).lower()
-            
-            if col1_lower in col2_lower or col2_lower in col1_lower:
-                base_similarity += 0.3
-            
-            # Add uniqueness similarity
-            unique1 = df[col1].nunique()
-            unique2 = df[col2].nunique()
-            
-            if unique1 == unique2:
-                base_similarity += 0.2
-            
-            return min(base_similarity, 1.0)
-            
-        except Exception:
-            return 0.1
-        
-    def process_multiple_data(self, csv_data_dict):
-        """
-        Process multiple CSV files and return relationships in JSON format.
-        
-        Args:
-            csv_data_dict (dict): Dictionary with filename as key and DataFrame as value
-            
-        Returns:
-            dict: Relationships in the format expected by the graph visualizer
-        """
-        relationships = {
-            "nodes": [],
-            "edges": []
-        }
-        
-        node_id_counter = 0
-        file_node_mapping = {}  # Track which nodes belong to which file
-        
-        # Create nodes for each file and their columns
-        for filename, df in csv_data_dict.items():
-            # Create a file node
-            file_node = {
-                "id": node_id_counter,
-                "label": f"File: {filename}",
-                "type": "file",
-                "properties": {
-                    "filename": filename,
-                    "rows": len(df),
-                    "columns": len(df.columns)
-                }
-            }
-            relationships["nodes"].append(file_node)
-            file_node_id = node_id_counter
-            node_id_counter += 1
-            
-            file_node_mapping[filename] = {"file_node": file_node_id, "columns": []}
-            
-            # Create column nodes for this file
-            for col in df.columns:
-                column_node = {
-                    "id": node_id_counter,
-                    "label": f"{filename}: {col}",
-                    "type": "column",
-                    "properties": self._get_column_info(df, col)
-                }
-                relationships["nodes"].append(column_node)
-                
-                # Connect column to file
-                relationships["edges"].append({
-                    "from": file_node_id,
-                    "to": node_id_counter,
-                    "label": "contains",
-                    "weight": 1.0,
-                    "type": "file_structure"
-                })
-                
-                file_node_mapping[filename]["columns"].append(node_id_counter)
-                node_id_counter += 1
-        
-        # Create relationships between columns across files
-        self._create_inter_file_relationships(relationships, csv_data_dict, file_node_mapping)
-        
-        return relationships
+            return "string"
 
-    def _create_inter_file_relationships(self, relationships, csv_data_dict, file_node_mapping):
-        """Create relationships between columns across different files"""
-        files = list(csv_data_dict.keys())
-        
-        for i, file1 in enumerate(files):
-            for j, file2 in enumerate(files):
-                if i >= j:  # Avoid duplicate comparisons
-                    continue
-                    
-                df1 = csv_data_dict[file1]
-                df2 = csv_data_dict[file2]
-                
-                # Compare columns between files
-                for col1_idx, col1 in enumerate(df1.columns):
-                    for col2_idx, col2 in enumerate(df2.columns):
-                        similarity = self._calculate_cross_file_similarity(
-                            df1, col1, df2, col2, file1, file2
-                        )
-                        
-                        if similarity > 0.3:  # Threshold for cross-file relationships
-                            node1_id = file_node_mapping[file1]["columns"][col1_idx]
-                            node2_id = file_node_mapping[file2]["columns"][col2_idx]
-                            
-                            relationships["edges"].append({
-                                "from": node1_id,
-                                "to": node2_id,
-                                "label": f"cross_file_similarity_{similarity:.2f}",
-                                "weight": float(similarity),
-                                "type": "cross_file_relationship"
-                            })
-
-    def _calculate_cross_file_similarity(self, df1, col1, df2, col2, file1, file2):
-        """Calculate similarity between columns from different files"""
-        try:
-            # Basic similarity factors
-            similarity = 0.0
-            
-            # Same column name
-            if col1.lower() == col2.lower():
-                similarity += 0.5
-            
-            # Similar data types
-            if df1[col1].dtype == df2[col2].dtype:
-                similarity += 0.2
-            
-            # Similar unique value counts (normalized)
-            unique1 = df1[col1].nunique()
-            unique2 = df2[col2].nunique()
-            max_unique = max(unique1, unique2)
-            min_unique = min(unique1, unique2)
-            
-            if max_unique > 0:
-                unique_similarity = min_unique / max_unique
-                similarity += unique_similarity * 0.3
-            
-            # Check for common values (sample-based for performance)
-            sample1 = set(df1[col1].dropna().astype(str).head(100))
-            sample2 = set(df2[col2].dropna().astype(str).head(100))
-            
-            if sample1 and sample2:
-                common_values = len(sample1.intersection(sample2))
-                total_values = len(sample1.union(sample2))
-                if total_values > 0:
-                    similarity += (common_values / total_values) * 0.3
-            
-            return min(similarity, 1.0)
-            
-        except Exception:
+    def compute_entropy(self, values):
+        if len(values) == 0:
             return 0.0
+        counter = Counter(values)
+        total = len(values)
+        entropy = -sum((count/total) * math.log2(count/total) for count in counter.values())
+        return round(entropy, 4)
+
+    def infer_regex_pattern(self, values, sample_size=100):
+        def simplify(val):
+            return re.sub(r'[A-Z]', 'A',
+                   re.sub(r'[a-z]', 'a',
+                   re.sub(r'\d', '9', val)))
+
+        simplified = [simplify(v) for v in values[:sample_size] if isinstance(v, str)]
+        if not simplified:
+            return None
+        pattern_counts = Counter(simplified)
+        most_common_pattern, _ = pattern_counts.most_common(1)[0]
+        return most_common_pattern
+
+    def profile_column(self, series: pd.Series, total_rows: int) -> dict:
+        non_null_series = series.dropna()
+        n_unique = non_null_series.nunique()
+        data_type = self.infer_data_type(series)
+
+        profile = {
+            "data_type": str(data_type),
+            "is_unique": bool(n_unique == total_rows),
+            "is_complete": bool(series.isnull().sum() == 0),
+            "is_categorical": bool((n_unique < 0.1 * total_rows) and (data_type in ["string", "int"])),
+            "num_unique_values": float(n_unique),
+            "sample_values": [str(v) for v in non_null_series.unique()[:5]]
+        }
+        if data_type in ["string", "int"]:
+            profile["entropy"] = self.compute_entropy(non_null_series.astype(str).tolist())
+        if data_type == "string":
+            profile["regex_pattern"] = self.infer_regex_pattern(non_null_series.tolist())
+
+        return profile
+
+    # def profile_table(self, file_path: str) -> dict:
+    #     df = pd.read_csv(file_path)
+    #     total_rows = len(df)
+    #     table_profile = {
+    #         "table_name": os.path.basename(file_path),
+    #         "num_rows": total_rows,
+    #         "columns": {}
+    #     }
+
+    #     for col in df.columns:
+    #         table_profile["columns"][col] = self.profile_column(df[col], total_rows)
+
+    #     return table_profile
+
+    # def profile_multiple_tables(self, file_paths: list) -> dict:
+    #     result = {}
+    #     for file in file_paths:
+    #         result[os.path.basename(file)] = self.profile_table(file)
+    #     return result
+
+    def detect_primary_keys(self, profile_data):
+        table_keys = {}
+        for table, meta in profile_data.items():
+            primary_keys = []
+            candidate_keys = []
+
+            for col, props in meta["columns"].items():
+                if props["is_unique"] and props["is_complete"]:
+                    primary_keys.append(col)
+                elif props["is_unique"]:
+                    candidate_keys.append(col)
+
+            table_keys[table] = {
+                "primary_keys": primary_keys,
+                "candidate_keys": candidate_keys
+            }
+        return table_keys
+
+    # def detect_foreign_keys(self, file_paths, profile_data, table_keys):
+    #     dataframes = {os.path.basename(file): pd.read_csv(file) for file in file_paths}
+    #     relationships = []
+
+    #     for from_table_path, df_from in dataframes.items():
+    #         from_table = os.path.basename(from_table_path)
+    #         for from_col in df_from.columns:
+    #             from_profile = profile_data[from_table]["columns"][from_col]
+    #             if from_profile["is_unique"]:
+    #                 continue
+
+    #             from_values = set(df_from[from_col].dropna())
+
+    #             for to_table_path, df_to in dataframes.items():
+    #                 to_table = os.path.basename(to_table_path)
+    #                 if from_table == to_table:
+    #                     continue
+
+    #                 for pk_col in table_keys[to_table]["primary_keys"]:
+    #                     to_values = set(df_to[pk_col].dropna())
+    #                     if not from_values or not to_values:
+    #                         continue
+
+    #                     common = from_values & to_values
+    #                     overlap_ratio = len(common) / len(from_values)
+
+    #                     if overlap_ratio > 0.8:
+    #                         relationships.append({
+    #                             "from_table": from_table,
+    #                             "from_column": from_col,
+    #                             "to_table": to_table,
+    #                             "to_column": pk_col,
+    #                             "confidence": round(overlap_ratio, 4)
+    #                         })
+    #     return relationships
+
+    def process_multiple_data(self, csv_data_dict: dict) -> list:
+        """
+        Args:
+            csv_data_dict: Dict of {filename: pd.DataFrame}
+        Returns:
+            List of relationship dicts
+        """
+        profile_data = self.profile_multiple_dataframes(csv_data_dict)
+        table_keys = self.detect_primary_keys(profile_data)
+        relationships = self.detect_foreign_keys_from_dfs(csv_data_dict, profile_data, table_keys)
+        return relationships
+
+    def profile_multiple_dataframes(self, df_dict: dict) -> dict:
+        result = {}
+        for fname, df in df_dict.items():
+            total_rows = len(df)
+            result[fname] = {
+                "table_name": fname,
+                "num_rows": total_rows,
+                "columns": {
+                    col: self.profile_column(df[col], total_rows) for col in df.columns
+                }
+            }
+        return result
+
+    def detect_foreign_keys_from_dfs(self, df_dict: dict, profile_data: dict, table_keys: dict) -> list:
+        relationships = []
+        for from_table, df_from in df_dict.items():
+            for from_col in df_from.columns:
+                from_profile = profile_data[from_table]["columns"][from_col]
+                if from_profile["is_unique"]:
+                    continue
+
+                from_values = set(df_from[from_col].dropna())
+
+                for to_table, df_to in df_dict.items():
+                    if from_table == to_table:
+                        continue
+
+                    for pk_col in table_keys[to_table]["primary_keys"]:
+                        to_values = set(df_to[pk_col].dropna())
+                        if not from_values or not to_values:
+                            continue
+
+                        common = from_values & to_values
+                        overlap_ratio = len(common) / len(from_values)
+
+                        if overlap_ratio > 0.8:
+                            relationships.append({
+                                "from_table": from_table,
+                                "from_column": from_col,
+                                "to_table": to_table,
+                                "to_column": pk_col,
+                                "confidence": round(overlap_ratio, 4)
+                            })
+        return relationships
